@@ -1,32 +1,41 @@
-import React,{useState} from "react";
-import { useHistory} from "react-router-dom";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
-const Signup = () => {
-  const [credentials, setcredentials] = useState({name:"", email: "", password: "" });
-  let history=useHistory();
+const Signup = (props) => {
+  const [credentials, setcredentials] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  let history = useHistory();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {name,email,password}=credentials;
+    const { name, email, password } = credentials;
     const response = await fetch("http://localhost:5000/api/auth/createuser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({name,email,password
-      }),
+      body: JSON.stringify({ name, email, password }),
     });
     const json = await response.json();
     console.log(json);
+    if (json.success) {
       // Save the auth token and redirect..
       localStorage.setItem("token", json.authtoken);
       history.push("/");
+      props.showAlert("Account created Successfully", "successw");
+    } else {
+      props.showAlert("Invalid Credentials", "danger");
+    }
   };
   const onChange = (e) => {
     setcredentials({ ...credentials, [e.target.name]: e.target.value });
   };
   return (
-    <div className="container">
+    <div className="container mt-3">
+      <h2>Create an account to use iNotebook</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="name">Name</label>
